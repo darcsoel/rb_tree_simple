@@ -1,5 +1,12 @@
-from env import BLACK, LEFT_ROTATION, NIL, RED, RIGHT_ROTATION
-from node import Node
+from env import (
+    BLACK,
+    LEFT_POSITION,
+    LEFT_ROTATION,
+    RED,
+    RIGHT_POSITION,
+    RIGHT_ROTATION,
+)
+from node import Node, get_color
 
 
 class RedBlackTree:
@@ -19,36 +26,46 @@ class RedBlackTree:
         self.root = None
 
     def insert(self, value: int):
+        """
+        inserting in _insert method
+        _case method responsible for recolor and rotate
+        """
+
         node = Node(value=value)
+        self._insert(node, self.root)
+        self._case1(node)
 
-        try:
-            self._case1(node)
-        except RuntimeError:
-            pass
-
+        self.root.color = BLACK
         return True
 
-    # def find(self, value) -> Node:
-    #     """
-    #     Find node with needed value
-    #
-    #     :param value: search value
-    #     :return: Node
-    #     """
-    #     if node.parent_node is None:
-    #         parent_node = self.root
-    #     else:
-    #         parent_node = node.parent
-    #
-    #     if node < parent_node:
-    #         return self.find(node.left_child)
-    #     elif node > parent_node:
-    #         return self.find(node.right_child)
-    #
-    #     if node == parent_node:
-    #         return parent_node
-    #
-    #     raise KeyError('Value not exist')
+    def _insert(self, node, parent):
+        """
+        Recursive insert logic
+
+        :param node: Node
+        :param parent: Node
+
+        :return: None
+        """
+        if not parent:
+            return node
+
+        if node >= parent:
+            if parent.right_child:
+                self._insert(node, parent.right_child)
+            else:
+                node.parent = parent
+                node.position = RIGHT_POSITION
+                parent.right_child = node
+                return node
+        else:
+            if parent.left_child:
+                self._insert(node, parent.left_child)
+            else:
+                node.parent = parent
+                node.position = LEFT_POSITION
+                parent.left_child = node
+                return node
 
     def _case1(self, node: Node):
         """
@@ -63,31 +80,15 @@ class RedBlackTree:
             node.color = BLACK
             self.root = node
 
-    def _case2(self, node: Node, parent=None):
+    def _case2(self, node: Node):
         """
         Case if father is black. Condition 3 and 5 are correct.
-
-        :param node: Node
-        :return: None
         """
 
-        parent = parent or self.root
-
-        if parent.color is BLACK:
-            if node > parent:
-                if parent.right_child is not None:
-                    self._case2(node, parent.right_child)
-                else:
-                    parent.right_child = node
-                    return
-            else:
-                if parent.left_child is not None:
-                    self._case2(node, parent.left_child)
-                else:
-                    parent.left_child = node
-                    return
-
-        self._case3(node)
+        if node.parent.color is BLACK:
+            return
+        else:
+            self._case3(node)
 
     def _case3(self, node: Node):
         """
@@ -98,29 +99,56 @@ class RedBlackTree:
         :return: None
         """
 
-        uncle = node.uncle
+        uncle_node = node.parent.brother
+        uncle_color = get_color(uncle_node)
 
-        if node.parent.color is RED and uncle and uncle.color is RED:
-            pass
+        if node.parent.color is RED and uncle_node and uncle_color is RED:
+            node.parent.color = BLACK
+            if uncle_node:
+                uncle_node.color = BLACK
+
+            if node.parent.parent:
+                if node.parent.parent.color is BLACK:
+                    node.parent.parent.color = RED
+                else:
+                    node.parent.parent.color = BLACK
+
+            return
         else:
             self._case4(node)
 
     def _case4(self, node: Node):
         """
         Father if red, uncle is black
-        New node is right child, parent is left child
-        Make left rotate
+        New node is right (left) child, parent is left (right) child
+        Make left (right) rotate from father
 
         :param node: Node
         :return: None
         """
-        pass
+
+        uncle = node.parent.brother
+
+        if node.parent.color is RED and get_color(uncle) is BLACK:
+            if (
+                node.parent.position is LEFT_POSITION
+                and node.parent.parent.position is LEFT_POSITION
+            ):
+                pass
+            elif (
+                node.parent.position is RIGHT_POSITION
+                and node.parent.parent.position is RIGHT_POSITION
+            ):
+                pass
+            return
+        else:
+            self._case5(node)
 
     def _case5(self, node: Node):
         """
         Father if red, uncle is black
-        New node is left child, parent is left child
-        Make right rotate with grandfather
+        New node is left (right) child, parent is left (right) child
+        Make right rotate (left) from grandfather
 
         :param node: Node
         :return: None
@@ -155,4 +183,4 @@ class RedBlackTree:
             parent.left_child = child
             child.left_child = rotator
         else:
-            raise ValueError('unknown rotation direction')
+            raise ValueError("unknown rotation direction")
