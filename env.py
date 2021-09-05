@@ -1,0 +1,11 @@
+"""Config constants"""
+
+BLACK = 'BLACK'
+RED = 'RED'
+NIL = 'NIL'
+
+LEFT_ROTATION = 'left'
+RIGHT_ROTATION = 'right'
+
+MAX_RECOLOR_ROTATE_COUNT = 3
+MAX_ADD_ROTATE_COUNT = 2
