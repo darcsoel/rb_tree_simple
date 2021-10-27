@@ -46,10 +46,18 @@ class Node:
         try:
             parent = self.parent
 
-            if parent.left_child.value == self.value:
+            if (
+                parent.left_child.value == self.value
+                or not parent.right_child.value
+            ):
                 brother = parent.right_child
-            else:
+            elif (
+                parent.right_child.value == self.value
+                or not parent.left_child.value
+            ):
                 brother = parent.left_child
+            else:
+                return None
         except AttributeError:
             return None
 

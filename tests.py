@@ -130,8 +130,8 @@ class ThreeElementsBaseTestCase(unittest.TestCase):
         self.assertEqual(tree.root.left_child.right_child.value, 3)
         self.assertEqual(tree.root.left_child.right_child.color, RED)
 
-        self.assertEqual(tree.root.right_child.left_child.value, 6)
-        self.assertEqual(tree.root.right_child.left_child.color, BLACK)
+        self.assertEqual(tree.root.right_child.value, 6)
+        self.assertEqual(tree.root.right_child.color, BLACK)
 
         self.assertEqual(tree.root.right_child.right_child.value, 10)
         self.assertEqual(tree.root.right_child.right_child.color, RED)
@@ -144,13 +144,13 @@ class ThreeElementsBaseTestCase(unittest.TestCase):
         values = [3, 1, 2]
         tree = insert_values_into_rb_tree(values)
 
-        self.assertEqual(tree.root.value, 3)
+        self.assertEqual(tree.root.value, 2)
         self.assertEqual(tree.root.color, BLACK)
 
         self.assertEqual(tree.root.left_child.value, 1)
         self.assertEqual(tree.root.left_child.color, RED)
 
-        self.assertEqual(tree.root.right_child.value, 2)
+        self.assertEqual(tree.root.right_child.value, 3)
         self.assertEqual(tree.root.right_child.color, RED)
 
     def test_insert_case5_2(self):

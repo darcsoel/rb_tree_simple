@@ -118,22 +118,34 @@ class RedBlackTree:
         """
 
         uncle = node.parent.brother
+        temp = None
 
         if node.parent.color is RED and get_color(uncle) is BLACK:
             if node.parent.position is LEFT and node.position is RIGHT:
-                node.position = LEFT
                 temp = node.parent
+                node.position = LEFT
+                tmp = node.parent.parent
                 node.parent.parent.left_child = node
                 temp.left_child = None
                 node.left_child = temp
+                temp.parent = node
+                temp.parent.parent = tmp
+                temp.right_child = None
             elif node.parent.position is RIGHT and node.position is LEFT:
-                node.position = RIGHT
                 temp = node.parent
+                node.position = RIGHT
+                tmp = node.parent.parent
                 node.parent.parent.right_child = node
                 temp.right_child = None
                 node.right_child = temp
+                temp.parent = node
+                temp.parent.parent = tmp
+                temp.left_child = None
 
-        self._case5(node)
+        if temp == self.root:
+            self.root = temp
+
+        self._case5(temp if temp else node)
 
     def _case5(self, node: Node):
         """
@@ -141,21 +153,32 @@ class RedBlackTree:
         New node is left (right) child, parent is left (right) child
         Make right rotate (left) from grandfather
 
-        In this case rotation could be done over root node
-
         :param node: Node
         :return: None
         """
         uncle = node.parent.brother
+        temp = None
 
         if node.parent.color is RED and get_color(uncle) is BLACK:
             if node.parent.position is LEFT and node.position is LEFT:
                 temp = node.parent.parent
-                node.parent.parent.left_child = node
-                temp.left_child = None
-                node.left_child = temp
+                node.parent.parent = temp.parent
+                temp.parent = node.parent
+                temp.left_child = uncle
+                temp.recolor()
+                temp.position = RIGHT
+                node.parent.right_child = temp
             elif node.parent.position is RIGHT and node.position is RIGHT:
-                pass
+                temp = node.parent.parent
+                node.parent.parent = temp.parent
+                temp.parent = node.parent
+                temp.right_child = uncle
+                temp.recolor()
+                temp.position = LEFT
+                node.parent.left_child = temp
+
+        if temp and temp.parent == self.root:
+            self.root = temp.parent
 
         self.root.color = BLACK
         return True
