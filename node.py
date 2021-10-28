@@ -20,9 +20,7 @@ class Node:
     @staticmethod
     def _check_color(color):
         if color not in [BLACK, RED]:
-            raise ValueError(
-                f"Wrong color {color}. Acceptable is {(BLACK, RED)}"
-            )
+            raise ValueError(f"Wrong color {color}. Acceptable is {(BLACK, RED)}")
 
     @property
     def position(self):
@@ -46,15 +44,9 @@ class Node:
         try:
             parent = self.parent
 
-            if (
-                parent.left_child.value == self.value
-                or not parent.right_child.value
-            ):
+            if parent.left_child.value == self.value or not parent.right_child.value:
                 brother = parent.right_child
-            elif (
-                parent.right_child.value == self.value
-                or not parent.left_child.value
-            ):
+            elif parent.right_child.value == self.value or not parent.left_child.value:
                 brother = parent.left_child
             else:
                 return None

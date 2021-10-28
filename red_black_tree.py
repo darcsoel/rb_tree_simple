@@ -142,9 +142,6 @@ class RedBlackTree:
                 temp.parent.parent = tmp
                 temp.left_child = None
 
-        if temp == self.root:
-            self.root = temp
-
         self._case5(temp if temp else node)
 
     def _case5(self, node: Node):
@@ -167,7 +164,16 @@ class RedBlackTree:
                 temp.left_child = uncle
                 temp.recolor()
                 temp.position = RIGHT
-                node.parent.right_child = temp
+
+                if node.parent is None:
+                    self.root = node
+                else:
+                    node.parent.right_child = temp
+                    node.parent.recolor()
+
+                    if node.parent.parent:
+                        node.parent.parent.left_child = node.parent
+
             elif node.parent.position is RIGHT and node.position is RIGHT:
                 temp = node.parent.parent
                 node.parent.parent = temp.parent
@@ -175,9 +181,17 @@ class RedBlackTree:
                 temp.right_child = uncle
                 temp.recolor()
                 temp.position = LEFT
-                node.parent.left_child = temp
 
-        if temp and temp.parent == self.root:
+                if node.parent is None:
+                    self.root = node
+                else:
+                    node.parent.left_child = temp
+                    node.parent.recolor()
+
+                    if node.parent.parent:
+                        node.parent.parent.right_child = node.parent
+
+        if temp and temp == self.root:
             self.root = temp.parent
 
         self.root.color = BLACK
