@@ -1,6 +1,6 @@
 import unittest
 
-from env import BLACK, LEFT_POSITION, RED, RIGHT_POSITION
+from env import BLACK, LEFT, RED, RIGHT
 from node import Node
 from red_black_tree import RedBlackTree
 
@@ -57,11 +57,11 @@ class ThreeElementsBaseTestCase(unittest.TestCase):
 
         self.assertEqual(tree.root.left_child.value, 3)
         self.assertEqual(tree.root.left_child.color, RED)
-        self.assertEqual(tree.root.left_child.position, LEFT_POSITION)
+        self.assertEqual(tree.root.left_child.position, LEFT)
 
         self.assertEqual(tree.root.right_child.value, 6)
         self.assertEqual(tree.root.right_child.color, RED)
-        self.assertEqual(tree.root.right_child.position, RIGHT_POSITION)
+        self.assertEqual(tree.root.right_child.position, RIGHT)
 
     def test_insert_case3_1(self):
         values = [5, 6, 3, 10]
@@ -115,6 +115,45 @@ class ThreeElementsBaseTestCase(unittest.TestCase):
         self.assertEqual(tree.root.right_child.right_child.color, RED)
 
     def test_insert_case4_1(self):
+        values = [5, 6, 3, 10, 1, 2]
+        tree = insert_values_into_rb_tree(values)
+
+        self.assertEqual(tree.root.value, 5)
+        self.assertEqual(tree.root.color, BLACK)
+
+        self.assertEqual(tree.root.left_child.value, 2)
+        self.assertEqual(tree.root.left_child.color, BLACK)
+
+        self.assertEqual(tree.root.left_child.left_child.value, 1)
+        self.assertEqual(tree.root.left_child.left_child.color, RED)
+
+        self.assertEqual(tree.root.left_child.right_child.value, 3)
+        self.assertEqual(tree.root.left_child.right_child.color, RED)
+
+        self.assertEqual(tree.root.right_child.value, 6)
+        self.assertEqual(tree.root.right_child.color, BLACK)
+
+        self.assertEqual(tree.root.right_child.right_child.value, 10)
+        self.assertEqual(tree.root.right_child.right_child.color, RED)
+
+    def test_insert_case5_1(self):
+        """
+        Testing case 4 and case 5 at same time
+        """
+
+        values = [3, 1, 2]
+        tree = insert_values_into_rb_tree(values)
+
+        self.assertEqual(tree.root.value, 2)
+        self.assertEqual(tree.root.color, BLACK)
+
+        self.assertEqual(tree.root.left_child.value, 1)
+        self.assertEqual(tree.root.left_child.color, RED)
+
+        self.assertEqual(tree.root.right_child.value, 3)
+        self.assertEqual(tree.root.right_child.color, RED)
+
+    def test_insert_case5_2(self):
         values = [5, 6, 3, 10, 1, 40]
         tree = insert_values_into_rb_tree(values)
 

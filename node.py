@@ -1,4 +1,4 @@
-from env import BLACK, LEFT_POSITION, RED, RIGHT_POSITION
+from env import BLACK, LEFT, RED, RIGHT
 
 
 class Node:
@@ -20,9 +20,7 @@ class Node:
     @staticmethod
     def _check_color(color):
         if color not in [BLACK, RED]:
-            raise ValueError(
-                f"Wrong color {color}. Acceptable is {(BLACK, RED)}"
-            )
+            raise ValueError(f"Wrong color {color}. Acceptable is {(BLACK, RED)}")
 
     @property
     def position(self):
@@ -30,10 +28,8 @@ class Node:
 
     @position.setter
     def position(self, value):
-        if value not in (LEFT_POSITION, RIGHT_POSITION):
-            raise ValueError(
-                f"Node position could be {LEFT_POSITION} or {RIGHT_POSITION}"
-            )
+        if value not in (LEFT, RIGHT):
+            raise ValueError(f"Node position could be {LEFT} or {RIGHT}")
 
         self._position = value
 
@@ -48,14 +44,24 @@ class Node:
         try:
             parent = self.parent
 
-            if parent.left_child.value == self.value:
+            if parent.left_child.value == self.value or not parent.right_child.value:
                 brother = parent.right_child
-            else:
+            elif parent.right_child.value == self.value or not parent.left_child.value:
                 brother = parent.left_child
+            else:
+                return None
         except AttributeError:
             return None
 
         return brother
+
+    def recolor(self):
+        if self.color is RED:
+            self.color = BLACK
+        elif self.color is BLACK:
+            self.color = RED
+        else:
+            raise ValueError(f"Wrong node color - {self.color}")
 
     def __lt__(self, other):
         return self.value < other.value

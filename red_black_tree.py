@@ -1,11 +1,4 @@
-from env import (
-    BLACK,
-    LEFT_POSITION,
-    LEFT_ROTATION,
-    RED,
-    RIGHT_POSITION,
-    RIGHT_ROTATION,
-)
+from env import BLACK, LEFT, RED, RIGHT
 from node import Node, get_color
 
 
@@ -55,7 +48,7 @@ class RedBlackTree:
                 self._insert(node, parent.right_child)
             else:
                 node.parent = parent
-                node.position = RIGHT_POSITION
+                node.position = RIGHT
                 parent.right_child = node
                 return node
         else:
@@ -63,7 +56,7 @@ class RedBlackTree:
                 self._insert(node, parent.left_child)
             else:
                 node.parent = parent
-                node.position = LEFT_POSITION
+                node.position = LEFT
                 parent.left_child = node
                 return node
 
@@ -108,10 +101,7 @@ class RedBlackTree:
                 uncle_node.color = BLACK
 
             if node.parent.parent:
-                if node.parent.parent.color is BLACK:
-                    node.parent.parent.color = RED
-                else:
-                    node.parent.parent.color = BLACK
+                node.parent.parent.recolor()
 
             return
         else:
@@ -121,28 +111,38 @@ class RedBlackTree:
         """
         Father if red, uncle is black
         New node is right (left) child, parent is left (right) child
-        Make left (right) rotate from father
+        Make left (right) rotate over father
 
         :param node: Node
         :return: None
         """
 
         uncle = node.parent.brother
+        temp = None
 
         if node.parent.color is RED and get_color(uncle) is BLACK:
-            if (
-                node.parent.position is LEFT_POSITION
-                and node.parent.parent.position is LEFT_POSITION
-            ):
-                pass
-            elif (
-                node.parent.position is RIGHT_POSITION
-                and node.parent.parent.position is RIGHT_POSITION
-            ):
-                pass
-            return
-        else:
-            self._case5(node)
+            if node.parent.position is LEFT and node.position is RIGHT:
+                temp = node.parent
+                node.position = LEFT
+                tmp = node.parent.parent
+                node.parent.parent.left_child = node
+                temp.left_child = None
+                node.left_child = temp
+                temp.parent = node
+                temp.parent.parent = tmp
+                temp.right_child = None
+            elif node.parent.position is RIGHT and node.position is LEFT:
+                temp = node.parent
+                node.position = RIGHT
+                tmp = node.parent.parent
+                node.parent.parent.right_child = node
+                temp.right_child = None
+                node.right_child = temp
+                temp.parent = node
+                temp.parent.parent = tmp
+                temp.left_child = None
+
+        self._case5(temp if temp else node)
 
     def _case5(self, node: Node):
         """
@@ -153,34 +153,46 @@ class RedBlackTree:
         :param node: Node
         :return: None
         """
-        pass
+        uncle = node.parent.brother
+        temp = None
 
-    def _rotate(self, node: Node, direction: str = LEFT_ROTATION) -> None:
-        """
-        Rotate peace of tree
-        Child and direction is linked, depends on direction
+        if node.parent.color is RED and get_color(uncle) is BLACK:
+            if node.parent.position is LEFT and node.position is LEFT:
+                temp = node.parent.parent
+                node.parent.parent = temp.parent
+                temp.parent = node.parent
+                temp.left_child = uncle
+                temp.recolor()
+                temp.position = RIGHT
 
-        :param node: center node to rotate, parent-(node)-child
-        :param direction: -1 - left, 1 - right
-        :return: None
-        """
-        if node == self.root:
-            node.color = BLACK
-            return
+                if node.parent is None:
+                    self.root = node
+                else:
+                    node.parent.right_child = temp
+                    node.parent.recolor()
 
-        if direction is LEFT_ROTATION:
-            parent = node.parent
-            rotator = node
-            child = node.right_child
+                    if node.parent.parent:
+                        node.parent.parent.left_child = node.parent
 
-            parent.left_child = child
-            child.left_child = rotator
-        elif direction is RIGHT_ROTATION:
-            parent = node.parent
-            rotator = node
-            child = node.left_child
+            elif node.parent.position is RIGHT and node.position is RIGHT:
+                temp = node.parent.parent
+                node.parent.parent = temp.parent
+                temp.parent = node.parent
+                temp.right_child = uncle
+                temp.recolor()
+                temp.position = LEFT
 
-            parent.left_child = child
-            child.left_child = rotator
-        else:
-            raise ValueError("unknown rotation direction")
+                if node.parent is None:
+                    self.root = node
+                else:
+                    node.parent.left_child = temp
+                    node.parent.recolor()
+
+                    if node.parent.parent:
+                        node.parent.parent.right_child = node.parent
+
+        if temp and temp == self.root:
+            self.root = temp.parent
+
+        self.root.color = BLACK
+        return True
